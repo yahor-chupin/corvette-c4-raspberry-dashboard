@@ -21,7 +21,11 @@ Your coffee helps me continue developing new features, adding more vehicle compa
 
 **Your support helps keep this project free and growing**
 
-<a href="https://www.buymeacoffee.com/ailvard" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+<a href="https://www.buymeacoffee.com/ailvard" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>   \<----------------
+
+Or QR code:
+
+![BuyMeaCoffee_QR](https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/bmc_qr.jpg)
 
 **Thank You!**
 
