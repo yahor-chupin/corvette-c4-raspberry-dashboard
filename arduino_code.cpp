@@ -80,8 +80,8 @@ float currentRPM = 0.0;
 
 // --- Fuel Level Smoothing Variables (RC Filtered) ---
 float displayFuelLevel = 50.0;      // Smoothed fuel level for display
-const float FUEL_SMOOTHING = 0.05;  // Heavy smoothing for RC filtered sensor (5% new, 95% old)
-const float FUEL_DEADBAND = 0.5;    // Tight deadband for filtered signal (0.5% threshold)
+const float FUEL_SMOOTHING = 0.02;  // Very heavy smoothing for sloshing resistance (2% new, 98% old)
+const float FUEL_DEADBAND = 1.0;    // Ignore small changes under 1% (reduces sloshing noise)
 
 // --- RPM Smoothing Variables ---
 float displayRPM = 0.0;              // Smoothed RPM for display
@@ -103,9 +103,8 @@ const float VOLTAGE_DEADBAND = 0.1;  // Ignore changes smaller than 0.1V
 float displaySpeed = 0.0;           // Smoothed speed for display
 float lastRawSpeed = 0.0;           // Previous raw speed reading
 bool speedIsZero = false;           // Track if we're currently showing zero speed
-const float SPEED_FAST_SMOOTHING = 0.95;  // Ultra-fast response for large speed changes (>5 MPH)
-const float SPEED_SLOW_SMOOTHING = 0.9;   // Very fast response for medium changes (2-5 MPH)
-const float SPEED_DEADBAND = 0.5;         // Ignore changes smaller than 0.5 MPH (very responsive)
+const float SPEED_NOISE_FILTER = 2.5;     // Ignore changes smaller than 2.5 MPH (reduces noise)
+const float SPEED_SMOOTHING = 0.7;        // Moderate smoothing (30% new, 70% old) - responsive but stable
 
 // --- Acceleration Detection Variables ---
 float previousRawSpeed = 0.0;       // RAW speed from previous cycle (not smoothed)
@@ -355,17 +354,17 @@ float fuelLevelPercent(float resistance) {
     
     float fuel_percent;  // Declare the variable
     
-    // Linear calibration: Lower voltage = Higher fuel level
-    if (voltage <= 0.05) {
-      fuel_percent = 100.0;  // Full tank (near 0V)
-    } else if (voltage >= 0.78) {
-      fuel_percent = 0.0;    // Empty tank
-    } else if (voltage <= 0.18) {
-      // At or below current level: 0V (100%) to 0.18V (45%)
-      fuel_percent = 100.0 - (voltage / 0.18) * 55.0;
+    // CORRECTED: Higher voltage = Higher fuel level (inverted from previous logic)
+    if (voltage >= 0.78) {
+      fuel_percent = 100.0;  // Full tank (high voltage)
+    } else if (voltage <= 0.05) {
+      fuel_percent = 0.0;    // Empty tank (low voltage)
+    } else if (voltage >= 0.18) {
+      // At or above current level: 0.78V (100%) to 0.18V (45%)
+      fuel_percent = 45.0 + ((voltage - 0.18) / (0.78 - 0.18)) * 55.0;
     } else {
-      // Above current level: 0.18V (45%) to 0.78V (0%)
-      fuel_percent = 45.0 - ((voltage - 0.18) / (0.78 - 0.18)) * 45.0;
+      // Below current level: 0.18V (45%) to 0.05V (0%)
+      fuel_percent = (voltage / 0.18) * 45.0;
     }
     
     // Clamp to valid range
@@ -501,9 +500,8 @@ void updateDistanceAndMPG(float deltaTime, float speed, float fuelLevel) {
   }
   
   // Calculate instant MPG and fuel flow - let Raspberry Pi handle display logic
-  // Convert ALDL fuel consumption from lb/hr to GPH
-  const float GASOLINE_DENSITY_LBS_PER_GALLON = 6.0; // Typical gasoline density
-  currentFuelFlowGPH = currentFuelConsumptionLbHr / GASOLINE_DENSITY_LBS_PER_GALLON;
+  // ESP32 ALDL calculation is already in GPH (not lb/hr as originally thought)
+  currentFuelFlowGPH = currentFuelConsumptionLbHr;  // Direct assignment - no conversion needed
   
   if (currentRPM > 500) { // Engine running
     if (speed > 1.0 && currentFuelFlowGPH > 0.01) { 
@@ -1047,16 +1045,16 @@ void loop() {
     // Software smoothing can be reduced if hardware filter is effective
     float fuelLevelDiff = abs(rawFuelPct - displayFuelLevel);
     
-    // Adaptive smoothing factor for RC filtered sensor
-    // RC filter provides hardware noise reduction, so software smoothing can be moderate
-    float adaptiveFuelSmoothing = (currentRPM > 500) ? 0.03 : FUEL_SMOOTHING; // Very heavy smoothing when engine running
-    float adaptiveDeadband = (currentRPM > 500) ? 0.3 : FUEL_DEADBAND; // Very tight deadband with RC filter
+    // Enhanced fuel smoothing to handle sloshing during acceleration/turning
+    // More aggressive smoothing when engine running (acceleration/braking/turning)
+    float adaptiveFuelSmoothing = (currentRPM > 500) ? 0.01 : FUEL_SMOOTHING; // Extra heavy smoothing when driving
+    float adaptiveDeadband = (currentRPM > 500) ? 1.5 : FUEL_DEADBAND; // Larger deadband when driving
     
     if (rawFuelPct >= 99.5) {
       // Disconnected sensor or very full tank - bypass smoothing for immediate 100% display
       displayFuelLevel = 100.0;
     } else if (fuelLevelDiff > adaptiveDeadband) {
-      // Apply adaptive smoothing for fuel level changes
+      // Apply heavy smoothing for fuel level changes (anti-sloshing)
       displayFuelLevel = displayFuelLevel * (1.0 - adaptiveFuelSmoothing) + rawFuelPct * adaptiveFuelSmoothing;
     }
     // If difference is within deadband, keep current value (no change)
@@ -1199,44 +1197,23 @@ void loop() {
       }
     }
     
-    // SMOOTHING TEMPORARILY DISABLED - Testing raw LM2907 performance
-    // Use raw speed directly to evaluate new stable hardware design
-    
+    // NOISE FILTERING - reduces ±3 MPH fluctuations without delays
     if (!speedIsZero) {
-      // No smoothing - direct raw speed output
-      displaySpeed = rawSpeed;
-      currentSpeed = rawSpeed;
-    }
-    
-    /* ORIGINAL SMOOTHING CODE (temporarily disabled)
-    if (!speedIsZero) {
-      // STARTUP SPIKE PREVENTION: Use gentle smoothing for first 3 seconds after leaving zero
-      unsigned long timeSinceStartup = now - startupTime;
-      bool inStartupPhase = (startupTime > 0 && timeSinceStartup < 3000);  // First 3 seconds
-      
-      if (inStartupPhase) {
-        // During startup phase - use very gentle smoothing to prevent spikes
-        displaySpeed = displaySpeed * 0.8 + rawSpeed * 0.2;  // Only 20% new value
+      if (speedDifference <= SPEED_NOISE_FILTER) {
+        // Small change - likely noise, ignore it
         currentSpeed = displaySpeed;
-      } else if (rawSpeed < displaySpeed && rawSpeed < 5.0) {
-        // Dropping towards zero - use minimal smoothing for fast return to zero
-        displaySpeed = displaySpeed * 0.1 + rawSpeed * 0.9;  // 90% new value - very fast drop
-        currentSpeed = displaySpeed;
-        startupTime = 0;  // Reset startup timer when approaching zero
-      } else if (speedDifference <= SPEED_DEADBAND) {
-        // Small change - ignore (eliminates low-speed jitter)
-        currentSpeed = displaySpeed;
-      } else if (speedDifference > 5.0) {
-        // Large change - fast response for acceleration/deceleration
-        displaySpeed = displaySpeed * (1.0 - SPEED_FAST_SMOOTHING) + rawSpeed * SPEED_FAST_SMOOTHING;
-        currentSpeed = displaySpeed;
+      } else if (speedDifference > 10.0) {
+        // Large change - use immediately (acceleration/deceleration)
+        displaySpeed = rawSpeed;
+        currentSpeed = rawSpeed;
       } else {
-        // Medium/small change - balanced smoothing
-        displaySpeed = displaySpeed * (1.0 - SPEED_SLOW_SMOOTHING) + rawSpeed * SPEED_SLOW_SMOOTHING;
+        // Medium change - apply light smoothing to reduce noise
+        displaySpeed = displaySpeed * (1.0 - SPEED_SMOOTHING) + rawSpeed * SPEED_SMOOTHING;
         currentSpeed = displaySpeed;
       }
     }
-    */
+    
+
     
     lastRawSpeed = rawSpeed;
     
