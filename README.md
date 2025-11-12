@@ -30,6 +30,22 @@ Or QR code:
 
 **Thank You!**
 
+## **Photos of different styles**
+
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/screenshots/classic_c4_style.jpg" alt="classic_c4_style" width="300" height="300"/>
+
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/screenshots/synthwave_style.jpg" alt="synthwave_style" width="300" height="300"/>
+
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/screenshots/nissan_style.jpg" alt="nissan_style" width="300" height="300"/>
+
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/screenshots/subaru_style.jpg" alt="subaru_style" width="300" height="300"/>
+
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/screenshots/citroen_style.jpg" alt="citroen_style" width="300" height="300"/>
+
+You can switch between styles by pressing simultaneously AVG MPG and TRIP ODO buttons 
+
+[Watch the video of Dashboard work](https://www.youtube.com/watch?v=eVXaNDhPiV4)
+
 ## 📁 **Required Files**
 
 ### **Core Application Files**
