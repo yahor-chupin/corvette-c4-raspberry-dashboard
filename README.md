@@ -25,7 +25,8 @@ Your coffee helps me continue developing new features, adding more vehicle compa
 
 Or QR code:
 
-![BuyMeaCoffee_QR](https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/bmc_qr.jpg =250x250)
+<img src="https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/bmc_qr.jpg" alt="QR_code" width="250" height="250"/>
+
 
 **Thank You!**
 
