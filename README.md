@@ -2,6 +2,30 @@
 
 A complete digital dashboard replacement for 1984-1996 Chevrolet Corvette (C4) featuring real-time sensor monitoring, fuel consumption tracking, and multiple display styles.
 
+## 🚗 C4 Corvette Digital Dashboard Creator
+
+Hi! I'm Yahor, an automotive electronics enthusiast who built a complete digital dashboard replacement for C4 Corvettes using Arduino, ESP32, and Raspberry Pi.
+
+### What I've created:
+- 5 retro-themed dashboard styles (Synthwave, Citroën BX, Subaru XT, Nissan 300ZX, C4 Classic)
+- Real-time ALDL ECU integration for accurate fuel consumption
+- Triple display setup with hardware-accelerated graphics
+- Open-source project free for personal use
+
+### Support my work:
+Your coffee helps me continue developing new features, adding more vehicle compatibility, and maintaining this free project for the automotive community!
+
+☕ Every coffee = More dashboard styles & features  
+🔧 GitHub: [Your GitHub Link]  
+📧 Contact: chupin.ye@gmail.com
+
+
+**Your support helps keep this project free and growing**
+
+<a href="https://www.buymeacoffee.com/ailvard" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+**Thank You!**
+
 ## 📁 **Required Files**
 
 ### **Core Application Files**
