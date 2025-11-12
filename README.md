@@ -544,7 +544,17 @@ This project is open source and welcomes contributions:
 
 ## 📄 **License**
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under a **Personal Use License**.
+
+### **License Summary:**
+- ✅ **FREE for personal use** - Install, modify, and use in your own vehicle
+- ✅ **FREE to share** - Distribute modifications for non-commercial purposes
+- ✅ **FREE to contribute** - Submit improvements to the project
+- ❌ **Commercial use requires permission** - Contact author for licensing
+
+**For commercial use inquiries:** chupin.ye@gmail.com
+
+See the [LICENSE](LICENSE) file for complete terms and conditions.
 
 ## 🙏 **Acknowledgments**
 
