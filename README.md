@@ -61,7 +61,7 @@ This project replaces the original C4 Corvette dashboard with a modern digital s
 
 ### **🔧 Hardware Architecture**
 
-![C4 Corvette Dashboard Schematic](corvette-c4-raspberry-dashboard/corvette_c4_dashboard.jpg)
+![C4 Corvette Dashboard Schematic](https://github.com/yahor-chupin/corvette-c4-raspberry-dashboard/blob/main/corvette_c4_dashboard.jpg)
 *Complete system wiring diagram showing Arduino Mega, ESP32 ALDL board, Raspberry Pi, and all sensor connections*
 
 #### **Main Arduino (Mega 2560)**
