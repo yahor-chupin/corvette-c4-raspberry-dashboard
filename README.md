@@ -16,7 +16,6 @@ Hi! I'm Yahor, an automotive electronics enthusiast who built a complete digital
 Your coffee helps me continue developing new features, adding more vehicle compatibility, and maintaining this free project for the automotive community!
 
 ☕ Every coffee = More dashboard styles & features  
-🔧 GitHub: [Your GitHub Link]  
 📧 Contact: chupin.ye@gmail.com
 
 
