@@ -48,9 +48,9 @@ const int ODOMETER_PIN    = 3;  // Odometer stepper motor pulse output
 // Pin 3 now used for odometer stepper motor control
 
 // --- New Digital Input Pins (with internal pull-up) ---
-const int PIN_AVG_MPG_SWITCH      = 15;  // Average MPG gauge switch (moved from pin 4)
+const int PIN_AVG_MPG_SWITCH      = 4;   // Average MPG gauge switch
 const int PIN_INST_MPG_SWITCH     = 5;   // Instant MPG gauge switch
-const int PIN_AVG_FUEL_RESET      = 4;   // Average fuel reset button (changed from 6 to 4)
+const int PIN_AVG_FUEL_RESET      = 21;  // Average fuel reset button (moved to pin 21 - pin 6 has hardware issue)
 const int PIN_TRIP_ODO_SWITCH     = 16;  // Trip odometer gauge switch (moved from pin 7)
 const int PIN_FUEL_RANGE_SWITCH   = 8;   // Fuel range gauge switch
 const int PIN_TRIP_ODO_RESET      = 7;   // Trip odometer reset button (changed from 9 to 7)
