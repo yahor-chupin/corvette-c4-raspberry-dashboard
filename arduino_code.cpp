@@ -48,12 +48,12 @@ const int ODOMETER_PIN    = 3;  // Odometer stepper motor pulse output
 // Pin 3 now used for odometer stepper motor control
 
 // --- New Digital Input Pins (with internal pull-up) ---
-const int PIN_AVG_MPG_SWITCH      = 4;   // Average MPG gauge switch
-const int PIN_INST_MPG_SWITCH     = 5;   // Instant MPG gauge switch
+const int PIN_AVG_MPG_SWITCH      = 34;  // Average MPG gauge switch
+const int PIN_INST_MPG_SWITCH     = 40;  // Instant MPG gauge switch
 const int PIN_AVG_FUEL_RESET      = 21;  // Average fuel reset button (moved to pin 21 - pin 6 has hardware issue)
 const int PIN_TRIP_ODO_SWITCH     = 16;  // Trip odometer gauge switch (moved from pin 7)
 const int PIN_FUEL_RANGE_SWITCH   = 8;   // Fuel range gauge switch
-const int PIN_TRIP_ODO_RESET      = 7;   // Trip odometer reset button (changed from 9 to 7)
+const int PIN_TRIP_ODO_RESET      = 22;  // Trip odometer reset button (moved from 7 to 22 - pin 7 has hardware issue)
 const int PIN_VOLTS_SWITCH        = 10;  // Volts gauge switch
 const int PIN_COOLANT_TEMP_SWITCH = 11;  // Coolant temp gauge switch
 const int PIN_OIL_PRESSURE_SWITCH = 12;  // Oil pressure gauge switch
@@ -1126,8 +1126,35 @@ void loop() {
     int oilTempSwitch     = !digitalRead(PIN_OIL_TEMP_SWITCH);
     int metricSwitch      = !digitalRead(PIN_METRIC_SWITCH);
 
+    // TEMPORARY DEBUG: Print MPG switch states every 2 seconds
+    static unsigned long lastDebugPrint = 0;
+    if (now - lastDebugPrint >= 2000) {
+      Serial.print("DEBUG_MPG - Pin34_RAW:");
+      Serial.print(digitalRead(PIN_AVG_MPG_SWITCH));
+      Serial.print(" Pin40_RAW:");
+      Serial.print(digitalRead(PIN_INST_MPG_SWITCH));
+      Serial.print(" AvgMpgSW:");
+      Serial.print(avgMpgSwitch);
+      Serial.print(" InstMpgSW:");
+      Serial.print(instMpgSwitch);
+      Serial.println();
+      
+      // Debug button states
+      Serial.print("DEBUG_BUTTONS - Pin21_RAW:");
+      Serial.print(digitalRead(PIN_AVG_FUEL_RESET));
+      Serial.print(" Pin22_RAW:");
+      Serial.print(digitalRead(PIN_TRIP_ODO_RESET));
+      Serial.print(" AvgResetBtn:");
+      Serial.print(avgFuelReset);
+      Serial.print(" TripResetBtn:");
+      Serial.print(tripOdoReset);
+      Serial.println();
+      
+      lastDebugPrint = now;
+    }
+
     // Button states are sent to Raspberry Pi in the regular data stream
-    // No timing logic needed in Arduino - Pi handles everything
+    // No timing logic needed in Ardu
 
     // Calculate deltaTime for trip/MPG calculations
     float deltaTime = now - lastPrintTime;
@@ -1302,21 +1329,25 @@ void loop() {
     // Send switch states and other data more frequently (every 200ms for better responsiveness)
     static unsigned long lastSwitchUpdate = 0;
     if (now - lastSwitchUpdate >= 150) {  // Increased frequency for better responsiveness
-      Serial.print("FUEL_RANGE:"); Serial.print(fuelRange, 1); Serial.print(",");
-      Serial.print("INST_MPG:"); Serial.print(instantMPG, 1); Serial.print(",");
-      Serial.print("AVG_MPG:"); Serial.print(averageMPG, 1); Serial.print(",");
-      Serial.print("FUEL_FLOW_GPH:"); Serial.print(currentFuelFlowGPH, 3); Serial.print(",");
-      Serial.print("AVG_MPG_SW:"); Serial.print(avgMpgSwitch); Serial.print(",");
-      Serial.print("INST_MPG_SW:"); Serial.print(instMpgSwitch); Serial.print(",");
-      Serial.print("TRIP_ODO_SW:"); Serial.print(tripOdoSwitch); Serial.print(",");
-      Serial.print("FUEL_RANGE_SW:"); Serial.print(fuelRangeSwitch); Serial.print(",");
-      Serial.print("VOLTS_SW:"); Serial.print(voltsSwitch); Serial.print(",");
-      Serial.print("COOLANT_TEMP_SW:"); Serial.print(coolantTempSwitch); Serial.print(",");
-      Serial.print("OIL_PRESS_SW:"); Serial.print(oilPressureSwitch); Serial.print(",");
-      Serial.print("OIL_TEMP_SW:"); Serial.print(oilTempSwitch); Serial.print(",");
-      Serial.print("METRIC_SW:"); Serial.print(metricSwitch); Serial.print(",");
-      Serial.print("TRIP_RESET_BTN:"); Serial.print(tripOdoReset); Serial.print(",");
-      Serial.print("AVG_RESET_BTN:"); Serial.print(avgFuelReset);
+      // IMPORTANT: Critical data FIRST so it's not truncated
+      // Button data first (for style change)
+      Serial.print("TRIP_BTN:"); Serial.print(tripOdoReset); Serial.print(",");
+      Serial.print("AVG_BTN:"); Serial.print(avgFuelReset); Serial.print(",");
+      // DSI gauge switches next (for display switching) - shortened names
+      Serial.print("OIL_P_SW:"); Serial.print(oilPressureSwitch); Serial.print(",");
+      Serial.print("OIL_T_SW:"); Serial.print(oilTempSwitch); Serial.print(",");
+      Serial.print("COOL_SW:"); Serial.print(coolantTempSwitch); Serial.print(",");
+      Serial.print("VOLT_SW:"); Serial.print(voltsSwitch); Serial.print(",");
+      // Then other data - shortened names
+      Serial.print("FUELRNG:"); Serial.print(fuelRange, 1); Serial.print(",");
+      Serial.print("IMPG:"); Serial.print(instantMPG, 1); Serial.print(",");
+      Serial.print("AMPG:"); Serial.print(averageMPG, 1); Serial.print(",");
+      Serial.print("FLOW:"); Serial.print(currentFuelFlowGPH, 3); Serial.print(",");
+      Serial.print("AMPG_SW:"); Serial.print(avgMpgSwitch); Serial.print(",");
+      Serial.print("IMPG_SW:"); Serial.print(instMpgSwitch); Serial.print(",");
+      Serial.print("TRIP_SW:"); Serial.print(tripOdoSwitch); Serial.print(",");
+      Serial.print("FUELR_SW:"); Serial.print(fuelRangeSwitch); Serial.print(",");
+      Serial.print("METR_SW:"); Serial.print(metricSwitch);
       Serial.println();
       lastSwitchUpdate = now;
     }

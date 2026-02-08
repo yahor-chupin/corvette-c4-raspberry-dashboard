@@ -9,6 +9,7 @@ import signal
 import sys
 from datetime import datetime
 
+print("THIS IS A DEBUG MESSAGE 1")
 # Remove window positioning to match temp_debug_with_grid.py
 # os.environ['SDL_VIDEO_WINDOW_POS'] = '-1024,0'  # DISABLED - was preventing center screen access
 
@@ -292,10 +293,11 @@ def handle_button_timing(trip_pressed, avg_pressed):
             
             button_combo_triggered = True
     else:
-        # Reset combo when buttons released
-        if button_combo_start_time > 0:
-            button_combo_start_time = 0
-            button_combo_triggered = False
+        # Reset combo ONLY when BOTH buttons are released (not when only one is pressed)
+        if not trip_pressed and not avg_pressed:
+            if button_combo_start_time > 0:
+                button_combo_start_time = 0
+                button_combo_triggered = False
         
         # Handle individual buttons only when combo is not active
         
@@ -666,8 +668,7 @@ def read_arduino_data():
                     print(f"Error parsing save data: {e}")
             return current_speed, current_rpm
         
-        if "SPEED:" in line or "FUEL_RANGE:" in line or "AVG_MPG_SW:" in line:
-
+        if "SPEED:" in line or "FUELRNG:" in line or "AMPG_SW:" in line:
             
             # Split by comma and parse key:value pairs (handles both high and low frequency messages)
             pairs = line.split(",")
@@ -782,48 +783,48 @@ def read_arduino_data():
                 current_trip_odo = data["TRIP_ODO"]
             if "TOTAL_ODO" in data:
                 current_total_odo = data["TOTAL_ODO"]
-            if "FUEL_RANGE" in data:
-                current_fuel_range = data["FUEL_RANGE"]
-            if "INST_MPG" in data:
-                current_inst_mpg = data["INST_MPG"]
-            if "AVG_MPG" in data:
-                current_avg_mpg = data["AVG_MPG"]
-            if "FUEL_FLOW_GPH" in data:
-                current_fuel_flow_gph = data["FUEL_FLOW_GPH"]
+            if "FUELRNG" in data:
+                current_fuel_range = data["FUELRNG"]
+            if "IMPG" in data:
+                current_inst_mpg = data["IMPG"]
+            if "AMPG" in data:
+                current_avg_mpg = data["AMPG"]
+            if "FLOW" in data:
+                current_fuel_flow_gph = data["FLOW"]
 
             
             # Update switch states for gauge switching
-            if "OIL_PRESS_SW" in data:
-                switch_oil_pressure = bool(int(data["OIL_PRESS_SW"]))
-            if "OIL_TEMP_SW" in data:
-                switch_oil_temp = bool(int(data["OIL_TEMP_SW"]))
-            if "COOLANT_TEMP_SW" in data:
-                switch_coolant_temp = bool(int(data["COOLANT_TEMP_SW"]))
-            if "VOLTS_SW" in data:
-                switch_volts = bool(int(data["VOLTS_SW"]))
-            if "FUEL_RANGE_SW" in data:
-                switch_fuel_range = bool(int(data["FUEL_RANGE_SW"]))
-            if "TRIP_ODO_SW" in data:
-                switch_trip_odo = bool(int(data["TRIP_ODO_SW"]))
-            if "INST_MPG_SW" in data:
-                switch_inst_mpg = bool(int(data["INST_MPG_SW"]))
-            if "AVG_MPG_SW" in data:
-                switch_avg_mpg = bool(int(data["AVG_MPG_SW"]))
-            if "METRIC_SW" in data:
-                switch_metric = bool(int(data["METRIC_SW"]))
+            if "OIL_P_SW" in data:
+                switch_oil_pressure = bool(int(data["OIL_P_SW"]))
+            if "OIL_T_SW" in data:
+                switch_oil_temp = bool(int(data["OIL_T_SW"]))
+            if "COOL_SW" in data:
+                switch_coolant_temp = bool(int(data["COOL_SW"]))
+            if "VOLT_SW" in data:
+                switch_volts = bool(int(data["VOLT_SW"]))
+            if "FUELR_SW" in data:
+                switch_fuel_range = bool(int(data["FUELR_SW"]))
+            if "TRIP_SW" in data:
+                switch_trip_odo = bool(int(data["TRIP_SW"]))
+            if "IMPG_SW" in data:
+                switch_inst_mpg = bool(int(data["IMPG_SW"]))
+            if "AMPG_SW" in data:
+                switch_avg_mpg = bool(int(data["AMPG_SW"]))
+            if "METR_SW" in data:
+                switch_metric = bool(int(data["METR_SW"]))
             
             # Handle button states with timing logic
-            if "TRIP_RESET_BTN" in data and "AVG_RESET_BTN" in data:
-                trip_btn = bool(int(data["TRIP_RESET_BTN"]))
-                avg_btn = bool(int(data["AVG_RESET_BTN"]))
+            if "TRIP_BTN" in data and "AVG_BTN" in data:
+                trip_btn = bool(int(data["TRIP_BTN"]))
+                avg_btn = bool(int(data["AVG_BTN"]))
                 
                 handle_button_timing(trip_btn, avg_btn)
             
             # Update button states for visual feedback
-            if "TRIP_RESET_BTN" in data:
-                button_trip_reset = bool(int(data["TRIP_RESET_BTN"]))
-            if "AVG_RESET_BTN" in data:
-                button_avg_reset = bool(int(data["AVG_RESET_BTN"]))
+            if "TRIP_BTN" in data:
+                button_trip_reset = bool(int(data["TRIP_BTN"]))
+            if "AVG_BTN" in data:
+                button_avg_reset = bool(int(data["AVG_BTN"]))
             
             # Handle persistent data communication
             if "TOTAL_ODO" in data and "TRIP_ODO" in data and "FUEL_USED" in data:
