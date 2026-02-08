@@ -1982,7 +1982,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
     
     # Adjusted margins to bring gauges closer to center for physical window fit
     top_margin = 70    # Original working position for Synthwave style (reverted to original)
-    bottom_margin = 50  # Original working position for Synthwave style (reverted to original)
+    bottom_margin = 80  # Increased to move bottom gauges UP and prevent cutoff
     
     # === 1. GAUGE 1 (Top Left) - Oil Pressure or Oil Temperature ===
     oil_rect = (margin, top_margin, gauge_width, gauge_height)
@@ -2307,7 +2307,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         # "RANGE" title (top) - removed "TRIP"
         range_title = font_small.render("RANGE", True, text_color)
         range_title_rect = range_title.get_rect()
-        dsi_surface.blit(range_title, (range_rect[0] + (gauge_width - range_title_rect.width) // 2, range_rect[1] + 10))
+        dsi_surface.blit(range_title, (range_rect[0] + (gauge_width - range_title_rect.width) // 2, range_rect[1] + 35))
         
         # Distance unit label (bottom)
         if switch_metric:
@@ -2325,7 +2325,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         digit_spacing = int(32 * 1.5)  # 48 (50% more spacing)
         total_width = 4 * digit_spacing + 35  # 4 digits plus decimal point space
         start_x = range_rect[0] + gauge_width - total_width - 10
-        start_y = range_rect[1] + 55
+        start_y = range_rect[1] + 75
         
         draw_dsi_multi_digit_display(dsi_surface, display_range, 4, start_x, start_y, digit_spacing, digit_color, digit_size, 0.3, decimal_pos=3)
     
@@ -2341,7 +2341,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         # "TRIP ODO" title (top)
         trip_title = font_small.render("TRIP ODO", True, text_color)
         trip_title_rect = trip_title.get_rect()
-        dsi_surface.blit(trip_title, (range_rect[0] + (gauge_width - trip_title_rect.width) // 2, range_rect[1] + 10))
+        dsi_surface.blit(trip_title, (range_rect[0] + (gauge_width - trip_title_rect.width) // 2, range_rect[1] + 35))
         
         # Distance unit label (bottom)
         if switch_metric:
@@ -2359,7 +2359,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         digit_spacing = int(32 * 1.5)  # 48 (50% more spacing)
         total_width = 4 * digit_spacing + 35  # 4 digits plus decimal point space
         start_x = range_rect[0] + gauge_width - total_width - 10
-        start_y = range_rect[1] + 55
+        start_y = range_rect[1] + 75
         
         draw_dsi_multi_digit_display(dsi_surface, display_trip, 4, start_x, start_y, digit_spacing, digit_color, digit_size, 0.3, decimal_pos=3)
     
@@ -2381,13 +2381,13 @@ def draw_dsi_screen_content(surface, speed, rpm):
         # "INSTANT" title (top)
         instant_title = font_small.render("INSTANT", True, text_color)
         instant_title_rect = instant_title.get_rect()
-        dsi_surface.blit(instant_title, (mpg_rect[0] + (gauge_width - instant_title_rect.width) // 2, mpg_rect[1] + 10))
+        dsi_surface.blit(instant_title, (mpg_rect[0] + (gauge_width - instant_title_rect.width) // 2, mpg_rect[1] + 35))
         
         # Handle special instant MPG values from Arduino
         digit_size = int(28 * 1.25)  # 35 (25% larger)
         digit_spacing = int(32 * 1.5)  # 48 (50% more spacing)
         start_x = mpg_rect[0] + 15
-        start_y = mpg_rect[1] + 55
+        start_y = mpg_rect[1] + 75
         
         if instant_mpg == 0.0:
             # Engine idling - show GPH using real fuel flow data
@@ -2443,7 +2443,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         # "AVERAGE" title (top)
         avg_title = font_small.render("AVERAGE", True, text_color)
         avg_title_rect = avg_title.get_rect()
-        dsi_surface.blit(avg_title, (mpg_rect[0] + (gauge_width - avg_title_rect.width) // 2, mpg_rect[1] + 10))
+        dsi_surface.blit(avg_title, (mpg_rect[0] + (gauge_width - avg_title_rect.width) // 2, mpg_rect[1] + 35))
         
         # Fuel economy digits (left side) - format 00.0 - 7-segment display with leading zero dimming
         if switch_metric:
@@ -2454,7 +2454,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         digit_size = int(28 * 1.25)  # 35 (25% larger)
         digit_spacing = int(32 * 1.5)  # 48 (50% more spacing)
         start_x = mpg_rect[0] + 15
-        start_y = mpg_rect[1] + 55
+        start_y = mpg_rect[1] + 75
         
         draw_dsi_multi_digit_display(dsi_surface, display_avg, 3, start_x, start_y, digit_spacing, digit_color, digit_size, 0.3, decimal_pos=2)
         
@@ -2556,7 +2556,7 @@ def draw_dsi_screen_content(surface, speed, rpm):
         fuel_text1_rect = fuel_text1.get_rect()
         fuel_text2_rect = fuel_text2.get_rect()
         
-        text_y = DSI_SCREEN_HEIGHT - 110  # Moved up even more from -80 to -110 (30px higher again)
+        text_y = DSI_SCREEN_HEIGHT - bottom_margin - 50  # Moved up 15px more (was -35, now -50)
         # Center the text under the fuel gauge
         dsi_surface.blit(fuel_text1, (fuel_center_x - fuel_text1_rect.width // 2, text_y))
         dsi_surface.blit(fuel_text2, (fuel_center_x - fuel_text2_rect.width // 2, text_y + 20))
@@ -2916,7 +2916,7 @@ def draw_bx_thick_road_speedometer(surface, speed, rect):
     
     # Calculate road center and positions - moved much higher on screen
     center_x = rect[0] + rect[2] // 2
-    top_y = rect[1] - 40   # FINE-TUNED HEIGHT - slightly lower for optimal positioning
+    top_y = rect[1] - 50   # Moved up 10 pixels more to prevent bottom cutoff
     bottom_y = top_y + road_height  # Calculate bottom from top
     
     # Speed range for filling (0-120 MPH)
@@ -3055,7 +3055,7 @@ def draw_bx_thick_road_speedometer(surface, speed, rect):
     # Check metric switch for unit display
     unit_text = "KPH" if switch_metric else "MPH"
     unit_label = unit_font.render(unit_text, True, BX_GREEN)
-    unit_rect = unit_label.get_rect(center=(center_x, dseg_y + dseg_size + 60))  # Much lower to prevent overlap with DSEG digits
+    unit_rect = unit_label.get_rect(center=(center_x, dseg_y + dseg_size + 50))  # Reduced spacing to prevent bottom cutoff
     surface.blit(unit_label, unit_rect)
 
 def draw_bx_gph_display(surface, gph_value, label, rect):
@@ -3535,7 +3535,7 @@ def draw_xt_road_bars(surface, speed, rpm, rect):
     
     # Calculate road center and positions
     center_x = rect[0] + rect[2] // 2
-    top_y = rect[1] + 230  # MOVED DOWN MORE - now starts 230px from top for better spacing
+    top_y = rect[1] + 215  # Adjusted to balance top and bottom margins
     bottom_y = top_y + road_height
     
     # Left road bar (TACHOMETER) - coordinates
